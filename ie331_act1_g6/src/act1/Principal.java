@@ -83,7 +83,8 @@ public class Principal {
 					// Opciones de Socio:
 					do {
 						opcionbien = true;
-						System.out.print("\nTODO: OPCIONES PARA EL SOCIO: ");
+						System.out.print("\n¿Qué desea hacer? ");
+						System.out.print("\n1. Tomar Prestado Libro \n2. Devolver Libro \n3. Ver Libros En Prestamo \n0. Cerrar Sistema");
 						
 						try{
 							opcion = Integer.parseInt(teclado.readLine());
@@ -91,7 +92,7 @@ public class Principal {
 							opcionbien = false;
 						}
 						
-						if (opcionbien && (opcion == 0 || (opcion > 100000 && opcion < 1000000))) {
+						if (opcionbien && (opcion >= 0 && opcion <= 3)) {
 							opcionbien = true;
 						}else {
 							System.out.println("La opción introducida no es válida");
@@ -99,6 +100,32 @@ public class Principal {
 						}
 						
 					}while(!opcionbien);
+					
+					if (opcion == 0) {
+						System.out.println("¡Adios!");
+						System.exit(0);
+					}else {
+						
+						// Petición ISBN (13 nums y 4 guiones)(ISBN 978-3-16-148410-0)
+						String isbn = teclado.readLine();
+						if (opcion == 1) {
+							System.out.println(biblioteca.atenderPeticion(true, num_carnet, isbn));
+						}else if(opcion == 2) {
+							System.out.println(biblioteca.atenderPeticion(false, num_carnet, isbn));
+						}else if(opcion == 3) {
+							
+							// TODO: TERMINAR ESTO DE LOS LIBROS EN PRESTAMO, BUCLE PARA VOLVER AL MENU Y TODAS LAS OPCIONES DE LA BIBLIOTECARIA
+							
+							System.out.println("Libros Tomados Actualmente: ");
+							for (int i = 0; i < socio.libroActualmenteTomados().size(); i++) {
+								System.out.println(socio.libroActualmenteTomados().get(i));
+							}
+						}
+																		
+					}
+					
+					
+					
 					
 				} else {
 					System.out.println("ERROR: No se ha registrado en el Sistema. Contacte con un Bibliotecario.");

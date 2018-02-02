@@ -92,7 +92,7 @@ public class Biblioteca {
 	}
 	
 	// Hemos tomado como referencia del libro el ISBN
-	public String atenderPeticion(int num_carnet, String isbn) {
+	public String atenderPeticion(boolean tomar, int num_carnet, String isbn) {
 		int idlibro = totalLibros.indexOf(isbn);
 		Libro libro = totalLibros.get(idlibro);
 		int idsocio = totalSocios.indexOf(num_carnet);
@@ -100,15 +100,28 @@ public class Biblioteca {
 		if (idlibro == -1) {
 			return "ERROR: Ese libro no existe en esta biblioteca";
 		}else{
-			if (totalLibros.get(idlibro).serTomado()) {
-				if (socio.tomarPrestado(libro)) {
-					return "Libro "+libro.getTitulo()+" prestado a "+socio.getNombre()+" satisfactoriamente.";
+			if (tomar) {
+				if (totalLibros.get(idlibro).serTomado()) {
+					if (socio.tomarPrestado(libro)) {
+						return "Libro "+libro.getTitulo()+" prestado a "+socio.getNombre()+" satisfactoriamente.";
+					}else {
+						return "ERROR: No se ha podido prestar el Libro";
+					}
+					
 				}else {
-					return "ERROR: No se ha podido prestar el Libro";
+					return "ERROR: Ese libro ya está prestado a "+socio.getNombre();
 				}
-				
 			}else {
-				return "ERROR: Ese libro ya está prestado a "+socio.getNombre();
+				if (totalLibros.get(idlibro).serDevuelto()) {
+					if (socio.devolverPrestamo(libro)) {
+						return "Libro "+libro.getTitulo()+" devuelto por "+socio.getNombre()+" satisfactoriamente.";
+					}else {
+						return "ERROR: No se ha podido devolver el Libro. Intentelo de nuevo.";
+					}
+					
+				}else {
+					return "ERROR: Ese libro NO está prestado";
+				}
 			}
 		}		
 	}

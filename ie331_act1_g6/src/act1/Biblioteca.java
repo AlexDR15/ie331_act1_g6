@@ -14,7 +14,7 @@ public class Biblioteca {
 	// Métodos
 	
 	public boolean addLibro(String isbn, String titulo, String autor) {
-		if (totalLibros.indexOf(isbn) == -1) {
+		if (isbn.length() == 13 && totalLibros.indexOf(isbn) == -1) {
 			this.libro= new Libro(isbn, titulo, autor);
 			totalLibros.add(this.libro);
 			return true;
@@ -60,6 +60,10 @@ public class Biblioteca {
 		}else {
 			return false;
 		}
+	}
+	
+	public Socio socioEscogido(int num_carnet){
+		return totalSocios.get(num_carnet);
 	}
 	
 	public String borrarSocio(int num_carnet) {

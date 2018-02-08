@@ -2,83 +2,242 @@ package act1;
 
 import java.util.ArrayList;
 
+/**
+ * Esta clase permite realizar las funciones del Bibliotecario. Tales como mostrar la lista de
+ * libros o socios, comprobar si existe un libro o socio, añadir/borrar libros o socios,
+ * a obtener los objetos Libro o Socio necesitados y a atender las peticiones de los Socios de la 
+ * Biblioteca.
+ * @author Alejandro Delgado, Alberto González y Daniel Rey
+ * @version 1.0
+ */
 public class Biblioteca {
 	
 	// Atributos
 	
+	/**
+	 * Colección total de Libros de la Biblioteca (prestados o no)
+	 */
 	private ArrayList<Libro> totalLibros = new ArrayList<Libro>();
+	
+	/**
+	 * Colección total de Socios de la Biblioteca
+	 */
 	private ArrayList<Socio> totalSocios = new ArrayList<Socio>();
+	
+	/**
+	 * Libro utilizado en los métodos de esta clase
+	 */
 	private Libro libro;
+	
+	/**
+	 * Socio utilizado en los métodos de esta clase
+	 */
 	private Socio socio;
 	
 	// Métodos
 	
+	/**
+	 * Método para mostrar todos los libros registrados en la Biblioteca
+	 * @return msg: String que muestra los libros de la Biblioteca
+	 */
+	public String librosRegistrados(){
+		Libro libro;
+		String msg = "";
+		// Recorrer Array de Libros
+		for (int i = 0; i < totalLibros.size(); i++) {
+			libro = totalLibros.get(i);
+			msg += " - "+libro.getTitulo()+" ("+libro.getAutor()+") [ISBN: "+libro.getISBN()+"]";
+			if (libro.getPoseedor() != 0) {
+				msg += " --> Prestado a "+libro.getPoseedor();
+			}
+			msg += "\n";
+		}
+		
+		return msg;
+	}
+	
+	/**
+	 * Método para mostrar todos los socios registrados en la Biblioteca
+	 * @return msg: String que muestra los libros  de la Biblioteca
+	 */
+	public String sociosRegistrados(){
+		Socio socio;
+		String msg = "";
+		// Recorrer Array de Socios
+		for (int i = 0; i < totalSocios.size(); i++) {
+			socio = totalSocios.get(i);
+			msg += " - "+socio.getNombre()+" ("+socio.getNumCarnet()+")";
+			msg += "\n";
+		}
+		
+		return msg;
+	}
+	
+	/**
+	 * Método utilizado para crear un Libro y meterlo en el Array de Libros de la Biblioteca
+	 * @param isbn: isbn del Libro
+	 * @param titulo: título del Libro
+	 * @param autor: autor del Libro
+	 * @return true: añade correctamente el Libro en el array utilizando el Constructor del 
+	 * Libro para crearlo (y comprobando antes que no hay otro libro con el mismo ISBN). 
+	 * false: no puede crear el Libro.
+	 */
 	public boolean addLibro(String isbn, String titulo, String autor) {
-		if (isbn.length() == 13 && totalLibros.indexOf(isbn) == -1) {
-			this.libro= new Libro(isbn, titulo, autor);
-			totalLibros.add(this.libro);
+		if (existeLibro(isbn) == -1) {
+			libro = new Libro(isbn, titulo, autor);
+			totalLibros.add(libro);
 			return true;
 		}else{
 			return false;
 		}	
 	}
 	
-	public boolean delLibro(String isbn) {
-		if (isbn != "") {
-			int idlibro = totalLibros.indexOf(isbn);
-			if (idlibro > -1) {
-				totalLibros.remove(idlibro);
-				return true;
+	/**
+	 * Método para comprobar si existe el Libro en el Array de "totalLibros" y obtener la posición
+	 * del Libro en el ArrayList.
+	 * @param isbn: ISBN del Libro
+	 * @return respuesta: posición del Libro introducido (vía ISBN) en el Array. Si no está dará un
+	 * -1.
+	 */
+	public int existeLibro(String isbn) {
+		int respuesta;
+		if (isbn.length() == 17) {
+			
+			if (totalLibros.size() == 0) {
+				respuesta = -1;
+			}else {
+				int i = 0;
+				do {
+					if (isbn.equals(totalLibros.get(i).getISBN())) {
+						respuesta = i;
+						i = totalLibros.size();
+					}else{
+						respuesta = -1;
+					}
+					i++;
+				}while(i < totalLibros.size());
+			}
+									
+		}else {
+			respuesta = -1;
+		}
+		return respuesta;
+	}
+	
+	/**
+	 * Método para sacar el Libro concreto deseado
+	 * @param posicion: posición del Libro en el array "totalLibros".
+	 * @return Libro deseado
+	 */
+	public Libro libroEscogido(int posicion){		
+		return totalLibros.get(posicion);
+	}
+	
+	/**
+	 * Método para eliminar Libro. Comprueba que el Libro no está prestado y luego lo borra.
+	 * @param isbn: ISBN del Libro.
+	 * @return true: Libro borrado con éxito (también se elimina del Array de "totalLibros" de sus
+	 * libros prestados actualmente. false: no pudo borrarse el Libro.
+	 */
+	public boolean borrarLibro(String isbn) {
+		if (isbn.length() == 17) {
+			int posicion = existeLibro(isbn);
+			if (posicion > -1) {
+				if (totalLibros.get(posicion).getPoseedor() == 0) {
+					totalLibros.remove(posicion);
+					return true;
+				}else {
+					return false;
+				}				
 			}else{
 				return false;
 			}
 		}else {
 			return false;
 		}
-			
 	}
 	
-	public boolean addSocio(String nombre) {
+	/**
+	 * Método para añadir Socio y meterlo en el Array de Socios de la Biblioteca
+	 * @param nombre: nombre del Socio
+	 * @return devuelve el número de carnet del Socio
+	 */
+	public int addSocio(String nombre) {
 		if (nombre != "") {
-			this.socio= new Socio(nombre);
-			totalSocios.add(this.socio);
-			return true;
+			socio = new Socio(nombre);
+			totalSocios.add(socio);
+			return socio.getNumCarnet();
 		}else {
-			return false;
+			return 0;
 		}
 			
 	}
 	
-	public boolean existeSocio(int num_carnet) {
+	/**
+	 * Método para comprobar si existe el Socio en el Array de "totalSocios" y obtener la posición
+	 * del Socio en el ArrayList.
+	 * @param num_carnet: Identificación del Socio
+	 * @return respuesta: posición del Socio introducido (vía número de carnet) en el Array. 
+	 * Si no está dará un -1.
+	 */
+	public int existeSocio(int num_carnet) {
+		int respuesta;
 		if (num_carnet > 100000) {
-			int idsocio = totalSocios.indexOf(num_carnet);
-			if (idsocio > -1) {
-				return true;
-			}else{
-				return false;
-			}
+			int i = 0;
+			do {
+				if (num_carnet == totalSocios.get(i).getNumCarnet()) {
+					respuesta = i;
+					i = totalSocios.size();
+				}else{
+					respuesta = -1;
+				}
+				i++;
+			}while(i < totalSocios.size());
+						
 		}else {
-			return false;
+			respuesta = -1;
 		}
+		return respuesta;
 	}
 	
-	public Socio socioEscogido(int num_carnet){
-		return totalSocios.get(num_carnet);
+	/**
+	 * Método para sacar el Socio concreto deseado
+	 * @param posicion: posición del Socio en el array "totalSocios".
+	 * @return Socio deseado
+	 */
+	public Socio socioEscogido(int posicion){		
+		return totalSocios.get(posicion);
 	}
 	
+	/**
+	 * Método para eliminar Socio. 
+	 * @return true: Libro borrado con éxito (también se elimina del Array de "totalLibros" de sus
+	 * libros prestados actualmente. false: no pudo borrarse el Libro.
+	 * @param num_carnet: número de carnet del Socio
+	 * @return msg: da un String de los libros que tiene el Socio antes de ser borrado (o en su
+	 * defecto anuncia que no tenía libros prestados).
+	 */
 	public String borrarSocio(int num_carnet) {
-		int idsocio = totalSocios.indexOf(num_carnet);
-		Socio socio = totalSocios.get(idsocio);
-		if (existeSocio(num_carnet)) {
-			// Mostrar Libros:
-			String msg = "Libros que tiene Actualmente el Socio: ";
-			for (int i = 0; i < socio.libroActualmenteTomados().size(); i++) {
-				msg = "\nLibro "+i+": "+socio.libroActualmenteTomados().get(i).getTitulo();	
-			}
+		int idsocio = existeSocio(num_carnet);
+		socio = socioEscogido(idsocio);
+		if (existeSocio(num_carnet) >= 0) {
 			
-			// Establecer Libros del Socio como NO prestados
-			for (int i = 0; i < socio.libroActualmenteTomados().size(); i++) {
-				socio.devolverPrestamo(socio.libroActualmenteTomados().get(i));	
+			String msg = "";
+			if (socio.libroActualmenteTomados().size() > 0) {
+				
+				// Mostrar Libros:
+				msg += "Libros que tiene Actualmente el Socio: ";
+				for (int i = 0; i < socio.libroActualmenteTomados().size(); i++) {
+					msg += "\n - Libro "+i+": "+socio.libroActualmenteTomados().get(i).getTitulo();	
+				}
+				
+				// Establecer Libros del Socio como NO prestados
+				do {
+					socio.devolverPrestamo(socio.libroActualmenteTomados().get(0));
+				}while(socio.libroActualmenteTomados().size() > 0);
+				
+			}else {
+				msg += "No tiene libros en prestamo...";
 			}
 			
 			// Borrar Socio
@@ -92,35 +251,33 @@ public class Biblioteca {
 	}
 	
 	// Hemos tomado como referencia del libro el ISBN
+	/**
+	 * Método para prestar Libros al Socio (comprobando si existe el Libro y si nadie lo tiene
+	 * actualemente prestado)
+	 * @param tomar: true para tomar el libro y false para devolverlo
+	 * @param num_carnet: número de carnet del Socio
+	 * @param isbn: ISBN del Libro
+	 * @return distintos Strings para decir que se ha prestado al Socio o para mostrar los 
+	 * distintos errores cuando no se le pueda prestar el Libro
+	 */
 	public String atenderPeticion(boolean tomar, int num_carnet, String isbn) {
-		int idlibro = totalLibros.indexOf(isbn);
-		Libro libro = totalLibros.get(idlibro);
-		int idsocio = totalSocios.indexOf(num_carnet);
-		Socio socio = totalSocios.get(idsocio);
-		if (idlibro == -1) {
+		Libro libro = totalLibros.get(existeLibro(isbn));
+		Socio socio = totalSocios.get(existeSocio(num_carnet));
+		if (existeLibro(isbn) == -1) {
 			return "ERROR: Ese libro no existe en esta biblioteca";
 		}else{
 			if (tomar) {
-				if (totalLibros.get(idlibro).serTomado()) {
-					if (socio.tomarPrestado(libro)) {
-						return "Libro "+libro.getTitulo()+" prestado a "+socio.getNombre()+" satisfactoriamente.";
-					}else {
-						return "ERROR: No se ha podido prestar el Libro";
-					}
-					
+				if (socio.tomarPrestado(libro)) {
+					return "Libro "+libro.getTitulo()+" prestado a "+socio.getNombre()+" satisfactoriamente.";
 				}else {
-					return "ERROR: Ese libro ya está prestado a "+socio.getNombre();
+					int poseedor = libro.getPoseedor();
+					return "ERROR: No se ha podido prestar el Libro. Ya está prestado al socio "+totalSocios.get(existeSocio(poseedor)).getNombre()+" ("+poseedor+")";
 				}
 			}else {
-				if (totalLibros.get(idlibro).serDevuelto()) {
-					if (socio.devolverPrestamo(libro)) {
-						return "Libro "+libro.getTitulo()+" devuelto por "+socio.getNombre()+" satisfactoriamente.";
-					}else {
-						return "ERROR: No se ha podido devolver el Libro. Intentelo de nuevo.";
-					}
-					
+				if (socio.devolverPrestamo(libro)) {
+					return "Libro "+libro.getTitulo()+" devuelto por "+socio.getNombre()+" satisfactoriamente.";
 				}else {
-					return "ERROR: Ese libro NO está prestado";
+					return "ERROR: Ese libro NO se te ha prestado";
 				}
 			}
 		}		
